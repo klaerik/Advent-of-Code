@@ -32,5 +32,5 @@ safe_coordinates = {k for k,v in coordinates.items() if v == 1}
 
 for k,v in claims.items():
     if safe_coordinates.issuperset(v):
-        print(f"Safe: {k}")
-       
+       print(f"Safe: {k}")
+       break
