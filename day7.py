@@ -27,18 +27,26 @@ buffer = list(up - down)
 
 len({1,} - {1,})
 
-while len(possible) > len(done):
-    buffer.sort()
-    
-    # Pick first node in buffer with satisfied dependencies
-    ready = None
+def ready_nodes(buffer):
+    ready = []
     for i,val in enumerate(buffer):
         upstream = steps[val].get('up',set())
         if len(upstream - set(done)) == 0:
-            ready = i
-            break
+            ready.append(i)
+    return ready
+
+def ready_workers(workers):
+    ready = []
+    
+    
+
+while len(possible) > len(done):
+    buffer.sort()
+    ready = ready_nodes(buffer)
+    
+    # Pick first node in buffer with satisfied dependencies
     #print(f"{buffer} {ready} START")
-    active = buffer.pop(ready)
+    active = buffer.pop(ready[0])
     #print(buffer)
     downstream = steps[active].get('down',set()) - set(done) - set(buffer)
     buffer.extend(list(downstream))
@@ -49,4 +57,6 @@ while len(possible) > len(done):
 solution = ''.join(done)
 print(f"Solution: {solution}")
     
+
+
 
