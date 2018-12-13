@@ -1,3 +1,10 @@
+import scikitlearn
+
+
+with open('/users/d934878/login_demo.R') as file:
+    for line in file:
+        print(line)
+
 from collections import deque
 
 def play_game(players, final_marble):
