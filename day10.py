@@ -114,4 +114,10 @@ starfield(stars)
 
 print(f"Solution 2: {age}")
 
-    
+
+stars = increment(stars, reverse=True)
+starfield(stars)
+
+stars = increment(stars, reverse=False)
+starfield(stars)
+
