@@ -1,17 +1,23 @@
 from typing import NamedTuple
+import os
 
-file = 'input/day15-test.txt'
-grid = []
-with open(file) as f:
-    for line in f:
-        grid.append(list(line.rstrip('\n')))
+
+def read_file(file):
+    grid = []
+    with open(file) as f:
+        for line in f:
+            grid.append(list(line.rstrip('\n')))
+    return grid
+
+def cls():
+    os.system('cls' if os.name=='nt' else 'clear')
 
 class Point(NamedTuple):
     x: int
     y: int
 
-def print_grid(grid=grid):
-    print('\n'.join([''.join(i) for i in grid]))
+def view_grid(grid):
+    return '\n'.join([''.join(i) for i in grid])
 
 def next_steps(point):
     x, y = point
@@ -41,7 +47,7 @@ def find_path(start, enemy, grid):
                     continue
                 explored.add(point)
                 thing = lookup(point, grid)
-                print(current, level, point, thing)
+#                print(current, level, point, thing)
                 if thing in ('#','X'):
                     continue
                 elif thing == '.':
@@ -81,7 +87,7 @@ class Combatant():
     def hit(self, attack):
         self.hp -= attack
         if not self.alive:
-            self.unit_type = 'X'
+            self.unit_type = '.'
             self.move(self.loc)
     
     def move(self, point):
@@ -94,12 +100,12 @@ class Combatant():
         in_range = [loc for loc in next_steps(self.loc) if lookup(loc, self.grid) == self.enemy_type]
         in_range.sort(key=lambda i: (i.y, i.x))
         if len(in_range) > 0:
-            print(in_range)
-            print(in_range[0])
+#            print(in_range)
+#            print(in_range[0])
             self.attack(in_range[0], units)
         else:
             path = find_path(self.loc, self.enemy_type, self.grid)
-            print(path)
+#            print(path)
             if len(path) > 0:
                 self.move(path[-1])
             else:
@@ -115,15 +121,29 @@ def setup_combatants(unit_type, enemy_type, grid):
                 units.append(Combatant(unit_type, enemy_type, point, grid))
     return units
 
+def combat_complete(units):
+    active = {i.unit_type for i in units if i.unit_type in {'G','E'}}
+    return True if len(active) == 1 else False
 
-elves = setup_combatants('E','G',grid)
-goblins = setup_combatants('G','E',grid)
-units = elves + goblins
-units.sort(key=lambda i: (i.loc.y, i.loc.x))
-for unit in units:
-    unit.turn(units)
-    print_grid(grid)
+def solve_puzzle(puzzle):
+    grid = read_file(puzzle)    
+    elves = setup_combatants('E','G',grid)
+    goblins = setup_combatants('G','E',grid)
+    units = elves + goblins
+    rounds = 0
+    while not combat_complete(units):
+        units.sort(key=lambda i: (i.loc.y, i.loc.x))
+        for unit in units:
+            unit.turn(units)
+            print(view_grid(grid))
+        rounds += 1
+    rounds -= 1
+    hp = sum([i.hp for i in units if i.unit_type != 'X'])
+    solution = rounds * hp
+    print(solution)
+    return solution, grid
 
-units[0].hp
+solved = solve_puzzle('input/day15-test.txt')
 
+solved2 = solve_puzzle('input/day15-test2.txt')
 
