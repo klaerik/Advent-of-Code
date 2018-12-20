@@ -31,7 +31,7 @@ def find_path(start, enemy, grid):
     '''Returns ([list, of, points, to, target], in_range T/F flag)'''
     search = {}
     current = start
-    explored = {start,}
+#    explored = {start,}
     search[current] = set()
     in_range = set()
     level = 0
@@ -43,9 +43,11 @@ def find_path(start, enemy, grid):
         for current in levels[level - 1]:
             search[current] = set()
             for point in next_steps(current):
-                if point in explored:
+#                if point in explored:
+#                    continue
+#                explored.add(point)
+                if point in search.keys():
                     continue
-                explored.add(point)
                 thing = lookup(point, grid)
 #                print(current, level, point, thing)
                 if thing in ('#','X'):
@@ -62,7 +64,10 @@ def find_path(start, enemy, grid):
         path = [nearest[0],]
         for i in range(level - 1):
             last = path[-1]
-            path.append([k for k,v in search.items() if last in v][0])
+            nxt = [k for k,v in search.items() if last in v]
+#            print(nxt)
+            nxt.sort(key = lambda i: (i.y, i.x))
+            path.append(nxt[0])
         return path[:-1]
         
 
@@ -75,7 +80,10 @@ class Combatant():
         self.loc = Point(start.x, start.y)
         self.grid = grid
         self.idle = False
-        
+
+    def __str__(self):
+        return f"Unit: {self.unit_type}, HP: {self.hp}, Loc: {self.loc}"
+    
     @property
     def alive(self):
         return True if self.hp > 0 else False
@@ -96,20 +104,24 @@ class Combatant():
         self.grid[self.loc.y][self.loc.x] = self.unit_type
 
     def turn(self, units):
-        self.idle = False
+        self.idle = True
+        
+        #Movement phase
+        path = find_path(self.loc, self.enemy_type, self.grid)
+#        print(f"Move {self.loc} to {path}")
+        if len(path) > 0:
+            self.move(path[-1])
+            self.idle = False
+        
+        #Attack phase
         in_range = [loc for loc in next_steps(self.loc) if lookup(loc, self.grid) == self.enemy_type]
         in_range.sort(key=lambda i: (i.y, i.x))
         if len(in_range) > 0:
 #            print(in_range)
 #            print(in_range[0])
             self.attack(in_range[0], units)
-        else:
-            path = find_path(self.loc, self.enemy_type, self.grid)
-#            print(path)
-            if len(path) > 0:
-                self.move(path[-1])
-            else:
-                self.idle = True  # end turn
+            self.idle = False
+        # end turn
 
 def setup_combatants(unit_type, enemy_type, grid):
     units = []
@@ -127,23 +139,34 @@ def combat_complete(units):
 
 def solve_puzzle(puzzle):
     grid = read_file(puzzle)    
+    print(view_grid(grid))
     elves = setup_combatants('E','G',grid)
     goblins = setup_combatants('G','E',grid)
     units = elves + goblins
     rounds = 0
     while not combat_complete(units):
+        print(f"Round {rounds}")
         units.sort(key=lambda i: (i.loc.y, i.loc.x))
         for unit in units:
             unit.turn(units)
-            print(view_grid(grid))
+        print(view_grid(grid))
+        for unit in units:
+            print(unit)
         rounds += 1
+        if rounds == 3:
+            break
     rounds -= 1
-    hp = sum([i.hp for i in units if i.unit_type != 'X'])
+    hp = sum([i.hp for i in units if i.unit_type in ('E','G')])
     solution = rounds * hp
     print(solution)
-    return solution, grid
+    return solution, rounds, hp, grid, units
 
 solved = solve_puzzle('input/day15-test.txt')
 
 solved2 = solve_puzzle('input/day15-test2.txt')
 
+solved3 = solve_puzzle('input/day15-test3.txt')
+
+solved4 = solve_puzzle('input/day15-test4.txt')
+for unit in solved4[-1]:
+    print(unit)
