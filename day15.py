@@ -88,11 +88,10 @@ class Combatant():
     def alive(self):
         return True if self.hp > 0 else False
 
-    def attack(self, point, units):
-        enemy = [unit for unit in units if unit.loc == point][0]
-        enemy.hit(self.ap)
+    def attack(self, enemy):
+        enemy.damage(self.ap)
     
-    def hit(self, attack):
+    def damage(self, attack):
         self.hp -= attack
         if not self.alive:
             self.unit_type = '.'
@@ -105,6 +104,8 @@ class Combatant():
 
     def turn(self, units):
         self.idle = True
+        if not self.alive:
+            return "Dead"
         
         #Movement phase
         path = find_path(self.loc, self.enemy_type, self.grid)
@@ -115,11 +116,12 @@ class Combatant():
         
         #Attack phase
         in_range = [loc for loc in next_steps(self.loc) if lookup(loc, self.grid) == self.enemy_type]
-        in_range.sort(key=lambda i: (i.y, i.x))
-        if len(in_range) > 0:
+        enemies = [unit for unit in units if unit.loc in in_range]
+        enemies.sort(key=lambda i: (i.hp, i.loc.y, i.loc.x))
+        if len(enemies) > 0:
 #            print(in_range)
 #            print(in_range[0])
-            self.attack(in_range[0], units)
+            self.attack(enemies[0])
             self.idle = False
         # end turn
 
@@ -153,9 +155,9 @@ def solve_puzzle(puzzle):
         for unit in units:
             print(unit)
         rounds += 1
-        if rounds == 3:
-            break
-    rounds -= 1
+#        if rounds == 28:
+#            break
+#    rounds -= 1
     hp = sum([i.hp for i in units if i.unit_type in ('E','G')])
     solution = rounds * hp
     print(solution)
@@ -168,5 +170,9 @@ solved2 = solve_puzzle('input/day15-test2.txt')
 solved3 = solve_puzzle('input/day15-test3.txt')
 
 solved4 = solve_puzzle('input/day15-test4.txt')
-for unit in solved4[-1]:
-    print(unit)
+assert solved4[0] == 27730
+
+solved5 = solve_puzzle('input/day15-test5.txt')
+assert solved4[0] == 36334
+
+
