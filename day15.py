@@ -49,7 +49,7 @@ def find_path(start, enemy, grid):
                 if point in search.keys():
                     continue
                 thing = lookup(point, grid)
-#                print(current, level, point, thing)
+                print(current, level, point, thing)
                 if thing in ('#','X'):
                     continue
                 elif thing == '.':
@@ -65,7 +65,7 @@ def find_path(start, enemy, grid):
         for i in range(level - 1):
             last = path[-1]
             nxt = [k for k,v in search.items() if last in v]
-#            print(nxt)
+            print(nxt)
             nxt.sort(key = lambda i: (i.y, i.x))
             path.append(nxt[0])
         return path[:-1]
@@ -104,26 +104,25 @@ class Combatant():
 
     def turn(self, units):
         self.idle = True
-        if not self.alive:
-            return "Dead"
-        
-        #Movement phase
-        path = find_path(self.loc, self.enemy_type, self.grid)
-#        print(f"Move {self.loc} to {path}")
-        if len(path) > 0:
-            self.move(path[-1])
-            self.idle = False
-        
-        #Attack phase
-        in_range = [loc for loc in next_steps(self.loc) if lookup(loc, self.grid) == self.enemy_type]
-        enemies = [unit for unit in units if unit.loc in in_range]
-        enemies.sort(key=lambda i: (i.hp, i.loc.y, i.loc.x))
-        if len(enemies) > 0:
-#            print(in_range)
-#            print(in_range[0])
-            self.attack(enemies[0])
-            self.idle = False
-        # end turn
+        if self.alive:
+           
+            #Movement phase
+            path = find_path(self.loc, self.enemy_type, self.grid)
+    #        print(f"Move {self.loc} to {path}")
+            if len(path) > 0:
+                self.move(path[-1])
+                self.idle = False
+            
+            #Attack phase
+            in_range = [loc for loc in next_steps(self.loc) if lookup(loc, self.grid) == self.enemy_type]
+            enemies = [unit for unit in units if unit.loc in in_range]
+            enemies.sort(key=lambda i: (i.hp, i.loc.y, i.loc.x))
+            if len(enemies) > 0:
+    #            print(in_range)
+    #            print(in_range[0])
+                self.attack(enemies[0])
+                self.idle = False
+            # end turn
 
 def setup_combatants(unit_type, enemy_type, grid):
     units = []
@@ -137,7 +136,7 @@ def setup_combatants(unit_type, enemy_type, grid):
 
 def combat_complete(units):
     active = {i.unit_type for i in units if i.unit_type in {'G','E'}}
-    return True if len(active) == 1 else False
+    return True if len(active) < 2 else False
 
 def solve_puzzle(puzzle):
     grid = read_file(puzzle)    
@@ -145,22 +144,26 @@ def solve_puzzle(puzzle):
     elves = setup_combatants('E','G',grid)
     goblins = setup_combatants('G','E',grid)
     units = elves + goblins
-    rounds = 0
+    rounds = -1
     while not combat_complete(units):
+        rounds += 1
         print(f"Round {rounds}")
         units.sort(key=lambda i: (i.loc.y, i.loc.x))
         for unit in units:
+            if combat_complete(units):
+                print("Finished combat")
+                break
             unit.turn(units)
+
         print(view_grid(grid))
         for unit in units:
             print(unit)
-        rounds += 1
-#        if rounds == 28:
+#        if rounds == 5:
 #            break
 #    rounds -= 1
     hp = sum([i.hp for i in units if i.unit_type in ('E','G')])
     solution = rounds * hp
-    print(solution)
+    print(f"{solution} = {rounds} * {hp}")
     return solution, rounds, hp, grid, units
 
 solved = solve_puzzle('input/day15-test.txt')
@@ -173,6 +176,23 @@ solved4 = solve_puzzle('input/day15-test4.txt')
 assert solved4[0] == 27730
 
 solved5 = solve_puzzle('input/day15-test5.txt')
-assert solved4[0] == 36334
+assert solved5[:3] == (36334, 37, 982)
 
+
+
+solved6 = solve_puzzle('input/day15-test6.txt')
+assert solved6[0:3] == [18468, 486, 38]
+
+solved7 = solve_puzzle('input/day15-test7.txt')
+assert solved7[0:3] == (13332, 66, 202)
+
+solved8 = solve_puzzle('input/day15-test8.txt')
+assert solved7[0:3] == (13332, 66, 202)
+
+
+solved9 = solve_puzzle('input/day15-test9.txt')
+assert solved9[1] == (66)
+
+solved10 = solve_puzzle('input/day15-test10.txt')
+assert solved10[1] == (71)
 
