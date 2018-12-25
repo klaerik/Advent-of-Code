@@ -62,6 +62,7 @@ class Water(Clay):
             push_status = self.push(self.down)
             if not push_status:
                 push_status = self.push(push_to)
+        print(self.loc, push_status)
         return push_status
 
     def flow(self):
@@ -70,15 +71,17 @@ class Water(Clay):
             return False
         else:
             flow_status = self.push(self.down)
+            print(flow_status)
             if not flow_status:
-                if self.grid.get(self.left, None) is None:
-                    flow_status = self.push(self.left)
-                elif self.grid.get(self.right, None) is None:
-                    flow_status = self.push(self.right)
-            if not flow_status:
-                flow_status = self.push(self.left)
-            if not flow_status:
-                flow_status = self.push(self.right)
+                sides = [self.left, self.right]
+                for d in sides:
+                    neighbor = self.grid.get(d, None)
+                    if neighbor is None:
+                        Water(*d, self.grid)
+                for d in sides:
+                    flow_status = self.push(d)
+                    if flow_status:
+                        break
             if not flow_status:
                 self.locked = True
             return flow_status
@@ -134,26 +137,11 @@ grid = find_clay(raw, grid)
 
 for i in range(50):
     Water(500, 0, grid)
-    print(represent_grid(grid))
     water = [thing for point,thing in grid.items() if thing.type == 'w']
     water.sort(key=lambda i: (i.loc.y), reverse=True)
     for drop in water:
         drop.flow()
-
-
-print(represent_grid(grid))
-water.flow()
-print(represent_grid(grid))
-water.flow()
-print(represent_grid(grid))
-water.flow()
-print(represent_grid(grid))
-water.flow()
-print(represent_grid(grid))
-
-
-
-
+    print(represent_grid(grid))
 
 
 
