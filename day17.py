@@ -10,6 +10,7 @@ class Clay():
         self.grid = grid
         grid[self.loc] = self
         self.type = '#'
+        self.locked = True
     
     def pushed(self, pusher):
         return False
@@ -31,61 +32,68 @@ class Water(Clay):
     def down(self):
         return Point(self.loc.x, self.loc.y + 1)
 
+    def is_locked(self):
+        down_thing = self.grid.get(self.down, None)
+        row_status = {down_thing.locked,}
+        for side in [self.left, self.right]:
+            thing = self.grid.get(side, None)
+            if thing is not None:
+                row_status.add(self.check_row(self.loc))
+            else:
+                row_status.add(False)
+        if row_status == {True,}:
+            self.locked = True
+        return self.locked
+
+    def check_row(self, last_point):
+        next_point = self.left if last_point == self.right else self.right
+        next_thing = self.grid.get(next_point, None)
+        down_thing = self.grid.get(self.down, None)
+        print(self.loc, next_point, next_thing, down_thing)
+        if self.type == '#':
+            return True
+        elif next_thing is None or down_thing is None:
+            return False
+        elif down_thing.locked is not True:
+            return False
+        else:
+            return self.row_status(self.lock)
+    
     def move(self, point):
-        self.grid[point] = grid.pop(self.loc)
+        self.grid[point] = self.grid.pop(self.loc)
         self.loc = point
         
-    def push(self, point):
-        thing = self.grid.get(point, None)
-        if thing is None:
-            pushed = True
-        else:
-            pushed = thing.pushed(self)
-            
-        if pushed:
-            self.move(point)
+    def drip(self):
+        if self.grid.get(self.down, None) is None:
+            self.move(self.down)
             return True
         else:
             return False
-    
-    def pushed(self, pusher):
-        if self.locked:
-            return False
-        
-        dx = self.loc.x - pusher.loc.x
-        dy = self.loc.y - pusher.loc.y
-        push_to = Point(self.loc.x + dx, self.loc.y + dy)
-
-        if push_to == self.down:
-            push_status = self.flow()
+            
+    def spread(self):
+        sides = [self.left, self.right]
+        spread = False
+        for side in sides:
+            neighbor = self.grid.get(side, None)
+            if neighbor is None:
+                spread = Water(*side, self.grid)
+        if spread:
+            self.move(spread.loc)
+            return True
         else:
-            push_status = self.push(self.down)
-            if not push_status:
-                push_status = self.push(push_to)
-        print(self.loc, push_status)
-        return push_status
-
+            return False
+            
     def flow(self):
         '''Try down, left, right pushes. Lock if can't move'''
         if self.locked:
             return False
+#        elif self.check_row == True:
+#            self
         else:
-            flow_status = self.push(self.down)
-            print(flow_status)
+            flow_status = self.drip()
             if not flow_status:
-                sides = [self.left, self.right]
-                for d in sides:
-                    neighbor = self.grid.get(d, None)
-                    if neighbor is None:
-                        Water(*d, self.grid)
-                for d in sides:
-                    flow_status = self.push(d)
-                    if flow_status:
-                        break
-            if not flow_status:
-                self.locked = True
+                flow_status = self.spread()
             return flow_status
-
 
 
 def import_file(file):
@@ -129,19 +137,48 @@ def represent_grid(grid):
         pretty.append(''.join(row))
     return '\n'.join(pretty)
 
+def in_range_drops(grid, start_y, end_y):
+    return {Point(thing.loc.x, thing.loc.y) for thing in grid.values() if thing.type == 'w' and start_y <= thing.loc.y <= end_y}
 
-file = 'input/day17-test.txt'
-raw = import_file(file)
-grid = {}
-grid = find_clay(raw, grid)
-
-for i in range(50):
-    Water(500, 0, grid)
-    water = [thing for point,thing in grid.items() if thing.type == 'w']
-    water.sort(key=lambda i: (i.loc.y), reverse=True)
-    for drop in water:
-        drop.flow()
+def solve(file):
+    raw = import_file(file)
+    grid = {}
+    grid = find_clay(raw, grid)
+    clay_y = {thing.loc.y for thing in grid.values() if thing.type == '#'}
+    start_y = min(clay_y)
+    end_y = max(clay_y)    
+    last = 0
+    current = 1
+    print(represent_grid(grid) + '\n')
+    while last != current:
+        last = current
+        Water(500, 0, grid)
+        water = [thing for point,thing in grid.items() if thing.type == 'w']
+        water.sort(key=lambda i: (i.loc.y), reverse=True)
+        for drop in water:
+            drop.flow()
+        current = in_range_drops(grid, start_y, end_y)
+        current = current if len(current) > 0 else last + 1
+        del_list = []
+        for point in grid:
+            if grid[point].type != 'w':
+                continue
+            elif point.y > end_y:
+                del_list.append(point)
+        for point in del_list:
+            del grid[point]
+            
     print(represent_grid(grid))
+    solution = len(in_range_drops(grid, start_y, end_y))
+    print(f"Found {solution} in range drops")
+    return solution, grid
 
+# Test cases
+assert solve('input/day17-test.txt')[0] == 57
+file = 'input/day17-test.txt'
 
+# Part 1
+file = 'input/day17.txt'
+solution = solve('input/day17.txt')
+print(f"Solution 1: {solution[0]}")
 
