@@ -104,34 +104,52 @@ def import_file(file):
     return ip, ops
 
 
-def solve(file, reg0 = 0):
+def solve(file, reg0 = 0, store = None):
 #    file = 'input/day19-test.txt'
+#   reg0 = 1
     ip, ops = import_file(file)
     reg = [reg0, 0, 0, 0, 0, 0]
     i = 0
     while 0 <= reg[ip] < len(ops):
+#    for x in range(1000):
         op = ops[reg[ip]]
-#        print(f"Registers: {reg}\tExecuting: {op}")
+        if op == Operation(addi, 2, 1, 2) and reg[1] > reg[2]:
+            op = Operation(setr, 1, 0, 2)
+            print(f"Override!")
+        print(f"Registers: {reg}\tExecuting: {op}")
         instruction = op.opcode
         reg = instruction(reg, *op[1:])
 #        print(f"Registers: {reg}")
         reg[ip] += 1
         i += 1
+        if isinstance(store, list) and reg[ip] == 3:
+            store.append(reg)
+            print(reg)
     reg[ip] -= 1    
     print(f"Final registers: {reg} (Rounds: {i - 1})")
-    return reg
+    return reg, store
 
 
 test = solve('input/day19-test.txt')
-assert test == [6, 5, 6, 0, 0, 9]
+assert test[0] == [6, 5, 6, 0, 0, 9]
+
+file = 'input/day19.txt'
+solution = solve(file)
+print(f"Solution 1: {solution[0][0]}")
 
 
-solution = solve('input/day19.txt')
-print(f"Solution 1: {solution[0]}")
+file = 'input/day19.txt'
+solution = solve(file, reg0 = 1, store = [])
 
 
-solution = solve('input/day19.txt', reg0=1)
-print(f"Solution 2: {solution[0]}")
+
+store = solution[1]
+store[:100]
+store[-100:]
+
+#solution = solve('input/day19.txt', reg0=1)
+#print(f"Solution 2: {solution[0]}")
+
 
 
 

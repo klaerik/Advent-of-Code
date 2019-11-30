@@ -55,6 +55,15 @@ def find_longest_path(paths):
 assert find_longest_path(create_graph('^WNE$')) == 3
 assert find_longest_path(create_graph('^ENWWW(NEEE|SSE(EE|N))$')) == 10
 assert find_longest_path(create_graph('^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$')) == 18
+assert find_longest_path(create_graph('^NNNNN(EEEEE|NNN)NNNNN$')) == 15
+
+circle = create_graph('^N(EEENWWW|N)$')
+nx.draw_networkx(circle)
+assert find_longest_path(circle) == 5
+
+edge = create_graph('^NNNNN(EEEEE|NNN)NNNNN$')
+nx.draw_networkx(edge)
+find_longest_path(edge)
 
 
 raw = import_file('input/day20.txt')
@@ -63,5 +72,8 @@ solution = find_longest_path(paths)
 print(f"Solution 1: {solution}")
 
 all_paths = nx.algorithms.shortest_path_length(paths, source=Point(0,0))
-min1k = len([k for k,v in all_paths.items() if v >= 1000])
+min1k = len([v for v in all_paths.values() if v >= 1000])
 print(f"Solution 2: {min1k}")
+
+nx.grid_graph(paths)
+

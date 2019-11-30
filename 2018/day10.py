@@ -1,3 +1,4 @@
+#!/home/karl/anaconda3/bin/python3
 from typing import NamedTuple
 import re
 import scipy.signal
