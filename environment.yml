@@ -1,0 +1,7 @@
+name: advent 
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7.*
+  - anaconda=2019.10
