@@ -3,7 +3,7 @@
 from math import floor
 
 def fuel(mass):
-    return floor(mass / 3) - 2
+    return max(floor(mass / 3) - 2, 0)
 
 assert fuel(12) == 2
 assert fuel(14) == 2
@@ -32,13 +32,9 @@ while zeros < len(reqs):
     f_next = fuel(f)
     if f_next <= 0:
         zeros += 1
-        out.append(0)
     elif zeros > 0:
         zeros -= 1
-        out.append(f_next)
-    else:
-        out.append(f_next)
-    #print(zeros, flush=True)
+    out.append(f_next)
     i += 1
 
 really_final_fuel = sum(out)
