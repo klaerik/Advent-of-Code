@@ -7,14 +7,16 @@ with open('input/day07.txt') as f:
 def lookup(pos, lst):
     return int(lst[pos]) if 0 <= pos < len(lst) else 0
 
-def run_prog(prog, input_ins=[-99], pos=0, debug=False, verbose=False):
-    i = 0
+def run_prog(prog, input_ins=[-99], pos=0, debug=False, verbose=False, final=False):
+    i = pos
     prog = prog.copy()
     out = None
+    final = False
     while i < len(prog):
         op_parms = prog[i].zfill(5)
         op = op_parms[-2:]
         if op == '99':
+            final = True
             break
         
         mode_c, mode_b, mode_a = op_parms[:3]
@@ -24,7 +26,7 @@ def run_prog(prog, input_ins=[-99], pos=0, debug=False, verbose=False):
         a_val = lookup(a, prog) if mode_a == '0' else a
         b_val = lookup(b, prog) if mode_b == '0' else b
         c_val = lookup(c, prog) if mode_c == '0' else c
-        
+       
         if op == '01':
             prog[c] = str(a_val + b_val)
             step = 4
@@ -32,7 +34,11 @@ def run_prog(prog, input_ins=[-99], pos=0, debug=False, verbose=False):
             prog[c] = str(a_val * b_val)
             step = 4
         elif op == '03':
-            prog[a] = str(input_ins.pop(0))
+            if len(input_ins) > 0:
+                prog[a] = str(input_ins.pop(0))
+            else:
+                print("Ran out of stuff!")
+                break
             step = 2
         elif op == '04':
             out = a_val
@@ -55,14 +61,27 @@ def run_prog(prog, input_ins=[-99], pos=0, debug=False, verbose=False):
         if debug:
             print('step', step, 'next', prog[i], 'opparms', op_parms, op, 'mode', mode_a, mode_b, mode_c, 'parms', a, b, c, 'vals', a_val, b_val, c_val)
             print(prog)
-    return out
+    return {'prog':prog, 'out':out, 'pos':i, 'final':final, 'input_ins':input_ins}
+
 
 def amplifier_circuit(prog, phase_sequence):
-    amp_output = 0
-    for phase_setting in phase_sequence:
-        input_ins = [phase_setting, amp_output]
-        amp_output = run_prog(prog, input_ins)
-    return amp_output
+    amps = [{'prog':prog.copy(), 'input_ins':[x], 'final':False} for x in phase_sequence]
+    prior_amp = False
+    while not amps[-1]['final']:
+        for i in range(len(amps)):
+            print(i)
+            amp = amps[i]
+            if prior_amp:
+                pao = prior_amp['out']
+                if pao is not None:
+                    amp['input_ins'].append(prior_amp['out'])
+            else:
+                amp['input_ins'].append(0)
+            amp = run_prog(**amp)
+            print(amp['out'])
+            #print(amp)
+            prior_amp = amp
+    return amps[-1]['out']
 
 
 def find_best_sequence(prog):
@@ -78,6 +97,7 @@ def find_best_sequence(prog):
 
 test = '3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0'.split(',')
 phase = (4,3,2,1,0)
+run_prog(test, [phase[0], 0])
 assert amplifier_circuit(test, phase) == 43210
 assert find_best_sequence(test)[0] == phase
 
