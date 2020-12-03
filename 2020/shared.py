@@ -9,3 +9,8 @@ def read_file(file):
     return out
 
 
+def product(nums):
+    out = 1
+    for num in nums:
+        out *= num
+    return out
