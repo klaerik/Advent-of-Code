@@ -19,7 +19,7 @@ def all_yes_per_group(group):
 
 
 # Solve puzzle for day 6
-raw = shared.read_file('input/day06.txt', include_blank_lines=True)
+raw = shared.read_file('2020/input/day06.txt', include_blank_lines=True)
 clean = cluster_groups(raw)
 
 part1 = sum([len(any_yes_per_group(group)) for group in clean])
