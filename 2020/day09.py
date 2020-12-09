@@ -1,7 +1,7 @@
 import shared
 from collections import deque
 
-def valid_xmas_num(num, group):
+def is_valid_xmas_num(num, group):
     for i in group:
         check = num - i
         if check in group and check != i:
@@ -12,7 +12,7 @@ def find_invalid_xmas(group, preamble=25):
     for i in range(preamble, len(group)):
         num = group[i]
         pre = set(group[i-preamble:i])
-        check = valid_xmas_num(num, pre)
+        check = is_valid_xmas_num(num, pre)
         if not check:
             return num
     return None
