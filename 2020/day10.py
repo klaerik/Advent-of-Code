@@ -23,15 +23,11 @@ def count_adapter_combos(adapters):
     out = {x:0 for x in clean}
     out[0] = 1
     for i,num in enumerate(clean):
-        if i == len(clean)-1:
-            break
-        j = i + 1
-        check = clean[j]
-        while check <= num + 3 and j < len(clean):
-            out[check] += out[num]
-            j += 1
-            if j < len(clean):
-                check = clean[j]
+        for next_num in clean[i+1:]:
+            if next_num <= num + 3:
+                out[next_num] += out[num]
+            else:
+                break
     return out[clean[-1]]
 
 print(f'Part 2: {count_adapter_combos(clean)} possible adapter combos')
