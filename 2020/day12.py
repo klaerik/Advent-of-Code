@@ -1,6 +1,5 @@
 import shared
 from collections import deque
-from math import gcd
 
 
 class Ship():
