@@ -25,18 +25,18 @@ class Ship():
         elif dir == 'E':
             self.x += dist
 
+    def forward(self, dist):
+        self.move(self.dir[0], dist)
+
     def step(self, cmd):
         action = cmd[0]
         dist = int(cmd[1:])
         if action in ('L','R'):
             self.turn(action, dist)
         elif action == 'F':
-            self.move(self.dir[0], dist)
+            self.forward(dist)
         else:
             self.move(action, dist)
-
-    def manhattan_dist(self):
-        return abs(self.x) + abs(self.y)
 
 
 class WaypointShip():
@@ -78,15 +78,14 @@ class WaypointShip():
         else:
             self.move(action, dist)
 
-    def manhattan_dist(self):
-        return abs(self.x) + abs(self.y)
-
+def manhattan_dist(x, y):
+    return abs(x) + abs(y)
 
 def traverse_commands(commands, model):
     ship = model()
     for command in commands:
         ship.step(command)
-    return ship.manhattan_dist()
+    return manhattan_dist(ship.x, ship.y)
 
 
 # Solve puzzle
