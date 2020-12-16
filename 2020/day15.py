@@ -16,27 +16,25 @@ def take_turn(turn_number, last_val, lookup):
 
 def play_game(initial, stop=2020):
     lookup = initialize_lookup(initial)
-    turns = initial[:]
-    i = len(turns)
+    i = len(initial)
+    num = initial[-1]
     while i < stop:
         i += 1
-        num = take_turn(i, turns[-1], lookup)
+        num = take_turn(i, num, lookup)
         lookup[num] = lookup.get(num, ())[-1:] + (i,)
-        turns.append(num)
-    return turns
+    return num
 
 
-assert play_game([0,3,6])[-1] == 436
-assert play_game([1,3,2])[-1] == 1
-assert play_game([2,1,3])[-1] == 10
-assert play_game([3,1,2])[-1] == 1836
+assert play_game([0,3,6]) == 436
+assert play_game([1,3,2]) == 1
+assert play_game([2,1,3]) == 10
+assert play_game([3,1,2]) == 1836
 
 initial = [9,3,1,0,8,4]
-turns = play_game(initial)
-print(f'Part 1: {turns[-1]} is the number spoken on turn 2020')
+print(f'Part 1: {play_game(initial)} is the number spoken on turn 2020')
 
-assert play_game([0,3,6], stop=30000000)[-1] == 175594
+assert play_game([0,3,6], stop=30000000) == 175594
 
-turns = play_game(initial, stop=30000000)
-print(f'Part 2: {turns[-1]} is the number spoken on turn 30000000')
+result = play_game(initial, stop=30000000)
+print(f'Part 2: {result} is the number spoken on turn 30000000')
 
