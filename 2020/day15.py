@@ -38,3 +38,4 @@ assert play_game([0,3,6], stop=30000000) == 175594
 result = play_game(initial, stop=30000000)
 print(f'Part 2: {result} is the number spoken on turn 30000000')
 
+
