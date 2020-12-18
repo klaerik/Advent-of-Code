@@ -2,8 +2,6 @@ import shared
 from collections import Counter
 
 
-
-
 def build_grid(raw):
     grid = {}
     for y,row in enumerate(raw):
@@ -12,8 +10,6 @@ def build_grid(raw):
             if val == '#':
                 grid[loc] = val
     return grid
-
-
 
 def get_neighbor_locs(loc):
     x, y, z = loc
@@ -62,7 +58,7 @@ def take_turn(grid):
     return grid
 
 def solve_puzzle(grid, rounds=6):
-    for _ in range(6):
+    for _ in range(rounds):
         grid = take_turn(grid)
     count = list(grid.values()).count('#')
     return count
