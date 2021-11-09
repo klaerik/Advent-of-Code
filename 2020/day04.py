@@ -32,7 +32,7 @@ def extract_passport(rec):
 
 
 # Solve day 4
-file = 'input/day04.txt'
+file = '2020/input/day04.txt'
 raw = shared.read_file(file, include_blank_lines=True)
 clean = ' '.join([x if x else ',' for x in raw]).split(',')
 passports = [extract_passport(rec) for rec in clean if rec]

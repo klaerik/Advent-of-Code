@@ -26,7 +26,7 @@ def is_valid2(a, b, letter, password):
 
 
 # Check validity
-file = 'input/day02.txt'
+file = '2020/input/day02.txt'
 raw = shared.read_file(file)
 
 valid = valid2 = 0

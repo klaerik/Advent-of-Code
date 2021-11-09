@@ -32,7 +32,7 @@ def get_seat(boarding_pass, row_size = (0, 127), col_size = (0, 7)):
 
 
 # Solve puzzle
-raw = shared.read_file('input/day05.txt')
+raw = shared.read_file('2020/input/day05.txt')
 seats = [get_seat(bp) for bp in raw if bp]
 
 seat_ids = [x[2] for x in seats]

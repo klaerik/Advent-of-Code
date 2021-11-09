@@ -17,7 +17,7 @@ def sled(right, down, field):
     return count
 
 
-file = 'input/day03.txt'
+file = '2020/input/day03.txt'
 raw = shared.read_file(file)
 
 # Part 1
