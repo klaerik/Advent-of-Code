@@ -1,4 +1,4 @@
- from itertools import combinations
+from itertools import combinations
 
 file = '2020/input/day01.txt'
 report = []
