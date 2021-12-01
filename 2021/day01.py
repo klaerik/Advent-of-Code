@@ -27,22 +27,21 @@ def track_depth(depths, window=None):
     out = 0
     last = None
     for depth in depths:
-        if last:
-            if last < depth:
-                out += 1
+        if last and last < depth:
+            out += 1
         last = depth
     return out
 
 def sliding_window(depths, window):
     nums = deque()
-    current = 0
+    total = 0
     out = []
     for depth in depths:
         nums.append(depth)
-        current += depth
+        total += depth
         if len(nums) == window:
-            out.append(current)
-            current -= nums.popleft()
+            out.append(total)
+            total -= nums.popleft()
     return out
 
 ### Solve part 1
