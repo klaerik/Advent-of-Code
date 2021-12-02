@@ -3,7 +3,7 @@ from collections import deque
 
 
 # Data
-raw = read_file('input/day01.txt', convert=int)
+raw = read_file('2021/input/day01.txt', convert=int)
 
 
 test = [
