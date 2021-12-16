@@ -1,5 +1,4 @@
 import shared
-from collections import deque
 import heapq
 
 ## Data
@@ -31,12 +30,12 @@ def find_neighbors(x, y, x_max, y_max, diagonal=False):
 
 def traverse_cavern(map):
     best = float('inf')
-    paths = deque(((0, (0,0)),))
+    paths = [(0, (0,0)),]
+    heapq.heapify(paths)
     x_max, y_max = len(map[0]), len(map)
     seen = {(0,0): 0}
     while paths:
-        score, position = paths.popleft()
-        print(score, position, len(paths))
+        score, position = heapq.heappop(paths)
         neighbors = find_neighbors(*position, x_max, y_max)
         for x,y in neighbors:
             new_score = score + int(map[y][x])
@@ -47,10 +46,9 @@ def traverse_cavern(map):
             if x == x_max-1 and y == y_max-1: # hit the final node
                 best = min(best, new_score)
             else:
-                print(f'add {x} and {y}')
-                paths.append((new_score, (x,y)))
+                heapq.heappush(paths, (new_score, (x,y)))
     return best
-  
+
 def expand_map(map):
     out = []
     for yx in range(5):
@@ -63,7 +61,6 @@ def expand_map(map):
 ## Testing
 assert traverse_cavern(test) == 40
 assert traverse_cavern(expand_map(test)) == 315
-
 
 ## Solutions
 print(f'Part 1: Lowest risk path is {traverse_cavern(raw)}')
