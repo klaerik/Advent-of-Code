@@ -4,9 +4,9 @@ import typing
 
 def read_file(path: Path|str = None, include_blank_lines: bool = False, convert: typing.Callable = None):
 
-    if path is None:
-        calling_path = Path(inspect.stack()[1].filename)
-        path = calling_path.parent / 'input' / calling_path.stem
+    if type(path) is str:
+        print("Building path for input file")
+        path = Path() / 'y2022' / 'input' / path
 
     print(f"Loading file from {path}")
     out = []

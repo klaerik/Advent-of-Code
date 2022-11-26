@@ -1,5 +1,5 @@
-name: advent 
+name: advent-of-code
 channels:
   - conda-forge
 dependencies:
-  - python=3.*
+  - python>=3.10

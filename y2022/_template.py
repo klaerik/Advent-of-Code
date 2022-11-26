@@ -1,7 +1,7 @@
-import shared
+import y2022.shared as shared
 
 ## Data
-raw = shared.read_file('2021/input/dayXX.txt')
+raw = shared.read_file('dayXX.txt')
 
 test = ''''''.split('\n')
 
