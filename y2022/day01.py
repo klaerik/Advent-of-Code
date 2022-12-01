@@ -4,7 +4,6 @@ import y2022.shared as shared
 raw = shared.read_file("day01.txt", include_blank_lines=True)
 test = shared.read_file("day01-test.txt", include_blank_lines=True)
 
-
 ## Functions
 def split_elf_inventories(raw):
     out = [[]]
@@ -15,27 +14,19 @@ def split_elf_inventories(raw):
             out[-1].append(int(val))
     return out
 
-def find_max_calories(inventories):
-    return max([sum(elf) for elf in inventories])
-
-def sum_calories(inventories, top_n=3):
+def sum_calories(inventories, top_n=1):
     sums = [sum(elf) for elf in inventories]
     return sum(sorted(sums)[-top_n:])
 
-def solve(raw):
+def solve(raw, n):
     invs = split_elf_inventories(raw)
-    return find_max_calories(invs)
-
-def solve2(raw):
-    invs = split_elf_inventories(raw)
-    return sum_calories(invs)
-
+    return sum_calories(invs, n)
 
 ## Testing
-assert solve(test) == 24000
-assert solve2(test) == 45000
+assert solve(test, 1) == 24000
+assert solve(test, 3) == 45000
 
 
 ## Solutions
-print(f"Solution to part 1: {solve(raw)}")
-print(f"Solution to part 2: {solve2(raw)}")
+print(f"Solution to part 1: {solve(raw, 1)}")
+print(f"Solution to part 2: {solve(raw, 3)}")
