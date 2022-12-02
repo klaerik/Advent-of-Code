@@ -8,44 +8,31 @@ test = shared.read_file('day02-test.txt')
 def split_rounds(raw):
     return [x.split() for x in raw]
 
-map_play = {
-    'A': 1,
-    'B': 2,
-    'C': 3,
-    'X': 1,
-    'Y': 2,
-    'Z': 3,
-}
-
-def find_winner(x,y):
-    lval = map_play[x]
-    rval = map_play[y]
-    if lval == rval:
-        return 3
-    elif lval + 1 == rval or lval - 2 == rval:
-        return 6
-    else:
-        return 0
-
-def score_rounds(rounds):
-    out = []
-    for left,right in rounds:
-        out.append(map_play[right] + find_winner(left, right))
-    return out
-
 def zipper(x):
     return dict(zip('ABC', x))
 
-def pick(x,y):
-    if y == 'X':
-        return zipper('ZXY')[x]
-    elif y == 'Y':
-        return zipper('XYZ')[x]
-    elif y == 'Z':
-        return zipper('YZX')[x]
+win = zipper('YZX')
+loss = zipper('ZXY')
+draw = zipper('XYZ')
+hand = {'X': 1, 'Y': 2, 'Z': 3}
+plays = dict(zip('XYZ', (loss, draw, win)))
+
+def score_round(left, right):
+    score = hand[right]
+    if win[left] == right:
+        score += 6
+    elif draw[left] == right:
+        score += 3
+    return score
+
+def score_rounds(rounds):
+    return [score_round(*round) for round in rounds]
+
+def pick_play(left, right):
+    return plays[right][left]
 
 def convert_rounds(rounds):
-    return [[x, pick(x,y)] for x,y in rounds]
+    return [[x, pick_play(x,y)] for x,y in rounds]
 
 def solve(raw, convert=False):
     rounds = split_rounds(raw)
