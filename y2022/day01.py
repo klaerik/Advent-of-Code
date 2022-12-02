@@ -26,7 +26,6 @@ def solve(raw, n):
 assert solve(test, 1) == 24000
 assert solve(test, 3) == 45000
 
-
 ## Solutions
 print(f"Solution to part 1: {solve(raw, 1)}")
 print(f"Solution to part 2: {solve(raw, 3)}")
