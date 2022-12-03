@@ -2,7 +2,7 @@ import y2022.shared as shared
 
 ## Data
 raw = shared.read_file('dayXX.txt')
-test = ''''''.split('\n')
+test = shared.read_file('dayXX-test.txt')
 
 ## Functions
 
@@ -14,8 +14,8 @@ def solve2(raw):
     pass
 
 ## Testing
-assert solve(test) == 0
-assert solve2(test) == 0
+assert solve(test) == None
+assert solve2(test) == None
 
 
 ## Solutions

@@ -1,0 +1,23 @@
+from pathlib import Path
+
+
+def create_input_files(year):
+    base = Path(f"y{year}/input")
+
+    for i in range(1,26):
+        day_num = f"{i:02d}"
+        files = base / f"day{day_num}.txt", base / f"day{day_num}-test.txt"
+        for file in files:
+            if not file.exists():
+                print(f"Creating file: {file}")
+                file.touch()
+
+
+
+
+# New year setup
+# create_input_files(2022)
+
+
+    
+
