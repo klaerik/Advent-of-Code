@@ -2,7 +2,7 @@ from pathlib import Path
 import inspect
 import typing
 
-def read_file(path: str|Path = None, include_blank_lines: bool = False, convert: typing.Callable = None):
+def read_file(path: str|Path = None, strip=True, include_blank_lines: bool = False, convert: typing.Callable = None):
 
     if type(path) is str:
         print("Building path for input file")
@@ -12,7 +12,7 @@ def read_file(path: str|Path = None, include_blank_lines: bool = False, convert:
     out = []
     with open(path) as f:
         for line in f:
-            clean = line.strip() 
+            clean = line.strip() if strip else line
             if clean and convert is not None:
                 clean = convert(clean)
             if clean or include_blank_lines:
