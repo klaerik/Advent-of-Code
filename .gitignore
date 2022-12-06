@@ -3,3 +3,4 @@ input/*
 *__pycache__*
 *.venv*
 *.vscode*
+.micromamba
