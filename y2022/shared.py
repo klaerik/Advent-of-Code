@@ -2,7 +2,7 @@ from pathlib import Path
 import inspect
 import typing
 
-def read_file(path: str|Path = None, strip=True, include_blank_lines: bool = False, convert: typing.Callable = None):
+def read_file(path: typing.Union[str,Path] = None, strip=True, include_blank_lines: bool = False, convert: typing.Callable = None):
 
     if type(path) is str:
         print("Building path for input file")
