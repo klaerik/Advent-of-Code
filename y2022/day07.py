@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import List, Dict
 
 ## Data
-raw = shared.read_file('day07.txt')
-test = shared.read_file('day07-test.txt')
+raw = shared.read_file("day07.txt")
+test = shared.read_file("day07-test.txt")
 
 ## Functions
 @dataclass
@@ -15,11 +15,13 @@ class Directory:
     files: Dict[str, "File"] = None
     size: int = 0
 
+
 @dataclass
 class File:
     name: str
     size: int = 0
     ext: str = None
+
 
 @dataclass
 class FileSystem:
@@ -30,65 +32,65 @@ class FileSystem:
 
     def __post_init__(self):
         self.cwd = Directory(
-            name = 'root',
-            files = {},
-            dirs = {},
-            parent = None,
+            name="root",
+            files={},
+            dirs={},
+            parent=None,
         )
         self.root = self.cwd
         self.dirs = []
         self.process_lines()
 
     def is_command(self, line: str):
-        return line.startswith('$')
+        return line.startswith("$")
 
     def split_command(self, line: str):
         command = line[2:]
-        if ' ' in command:
+        if " " in command:
             command, arg = command.split()
         else:
             arg = None
         return command, arg
 
     def mkdir(self, dirname: str):
-        if dirname == '/':
-            dirname = 'root'
+        if dirname == "/":
+            dirname = "root"
         if dirname not in self.cwd.dirs:
             new_dir = Directory(
-                name = dirname,
-                parent = self.cwd,
-                dirs = {},
-                files = {},
+                name=dirname,
+                parent=self.cwd,
+                dirs={},
+                files={},
             )
-            self.cwd.dirs[dirname] = new_dir        
+            self.cwd.dirs[dirname] = new_dir
 
     def stat_file(self, filename: str, size: int):
         if filename not in self.cwd.files:
             new_file = File(
-                name = filename,
+                name=filename,
                 # parent = self.cwd,
-                size = int(size),
-                ext = filename.split('.')[1] if '.' in filename else None
+                size=int(size),
+                ext=filename.split(".")[1] if "." in filename else None,
             )
             self.cwd.files[filename] = new_file
 
     def cd(self, arg: str):
-            if arg == '..':
-                self.cwd = self.cwd.parent
-            else:
-                if arg not in self.cwd.dirs:
-                    print(f"Creating directory {arg}...")
-                    new_dir = Directory(
-                        name = arg,
-                        parent = self.cwd,
-                        dirs = {},
-                        files = {},
-                    )
-                    self.cwd.dirs[arg] = new_dir
-                self.cwd = self.cwd.dirs[arg]
+        if arg == "..":
+            self.cwd = self.cwd.parent
+        else:
+            if arg not in self.cwd.dirs:
+                print(f"Creating directory {arg}...")
+                new_dir = Directory(
+                    name=arg,
+                    parent=self.cwd,
+                    dirs={},
+                    files={},
+                )
+                self.cwd.dirs[arg] = new_dir
+            self.cwd = self.cwd.dirs[arg]
 
     def process_line(self, line: str):
-        if line.startswith('dir'):
+        if line.startswith("dir"):
             dirname = line.split()[1]
             self.mkdir(dirname)
         elif line[0].isdigit():
@@ -96,16 +98,16 @@ class FileSystem:
             self.stat_file(filename, size)
         elif self.is_command(line):
             command, arg = self.split_command(line)
-            if command == 'cd' and arg != '/':
+            if command == "cd" and arg != "/":
                 self.cd(arg)
-            elif command == 'ls':
+            elif command == "ls":
                 pass
-    
+
     def process_lines(self):
         for line in self.commands:
             self.process_line(line)
 
-    def du(self, directory: Directory = None):
+    def du(self, directory: Directory = None) -> int:
         if directory is None:
             directory = self.root
         size = 0
@@ -114,33 +116,37 @@ class FileSystem:
         directory.size = size
         self.dirs.append(directory)
         return size
-    
-    def get_total_size(self, max_size=100000):
+
+    def get_total_size(self, max_size=100000) -> int:
         return sum([d.size for d in self.dirs if d.size <= max_size])
 
-    def find_dir_to_delete(self, 
-            fs_max_size = 70000000,
-            update_size = 30000000,
-            ):
+    def find_dir_to_delete(
+        self,
+        fs_max_size=70000000,
+        update_size=30000000,
+    ) -> Directory:
         _ = self.get_total_size()
         remaining_size = fs_max_size - self.root.size
         free_up_size = update_size - remaining_size
         if free_up_size <= 0:
             return 0
         else:
-            sizes = [d.size for d in self.dirs if d.size >= free_up_size]
+            sizes = [(d.size, d) for d in self.dirs if d.size >= free_up_size]
             sizes.sort()
-            return sizes[0]
+            return sizes[0][1]
+
 
 def solve(raw):
     fs = FileSystem(raw)
     fs.du()
     return fs.get_total_size()
 
+
 def solve2(raw):
     fs = FileSystem(raw)
     fs.du()
-    return fs.find_dir_to_delete()
+    return fs.find_dir_to_delete().size
+
 
 ## Testing
 assert solve(test) == 95437

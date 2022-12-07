@@ -1,8 +1,8 @@
 import y2022.shared as shared
 
 ## Data
-raw = shared.read_file('dayXX.txt')
-test = shared.read_file('dayXX-test.txt')
+raw = shared.read_file("dayXX.txt")
+test = shared.read_file("dayXX-test.txt")
 
 ## Functions
 
@@ -10,8 +10,10 @@ test = shared.read_file('dayXX-test.txt')
 def solve(raw):
     pass
 
+
 def solve2(raw):
     pass
+
 
 ## Testing
 assert solve(test) == None

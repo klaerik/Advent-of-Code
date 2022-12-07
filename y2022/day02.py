@@ -1,21 +1,24 @@
 import y2022.shared as shared
 
 ## Data
-raw = shared.read_file('day02.txt')
-test = shared.read_file('day02-test.txt')
+raw = shared.read_file("day02.txt")
+test = shared.read_file("day02-test.txt")
 
 ## Functions
 def split_rounds(raw):
     return [x.split() for x in raw]
 
-def zipper(x):
-    return dict(zip('ABC', x))
 
-win = zipper('YZX')
-loss = zipper('ZXY')
-draw = zipper('XYZ')
-hand = {'X': 1, 'Y': 2, 'Z': 3}
-plays = dict(zip('XYZ', (loss, draw, win)))
+def zipper(x):
+    return dict(zip("ABC", x))
+
+
+win = zipper("YZX")
+loss = zipper("ZXY")
+draw = zipper("XYZ")
+hand = {"X": 1, "Y": 2, "Z": 3}
+plays = dict(zip("XYZ", (loss, draw, win)))
+
 
 def score_round(left, right):
     score = hand[right]
@@ -25,14 +28,18 @@ def score_round(left, right):
         score += 3
     return score
 
+
 def score_rounds(rounds):
     return [score_round(*round) for round in rounds]
+
 
 def pick_play(left, right):
     return plays[right][left]
 
+
 def convert_rounds(rounds):
-    return [[x, pick_play(x,y)] for x,y in rounds]
+    return [[x, pick_play(x, y)] for x, y in rounds]
+
 
 def solve(raw, convert=False):
     rounds = split_rounds(raw)
