@@ -37,6 +37,7 @@ class FileSystem:
         )
         self.root = self.cwd
         self.dirs = []
+        self.process_lines()
 
     def is_command(self, line: str):
         return line.startswith('$')
@@ -49,45 +50,54 @@ class FileSystem:
             arg = None
         return command, arg
 
+    def mkdir(self, dirname: str):
+        if dirname == '/':
+            dirname = 'root'
+        if dirname not in self.cwd.dirs:
+            new_dir = Directory(
+                name = dirname,
+                parent = self.cwd,
+                dirs = {},
+                files = {},
+            )
+            self.cwd.dirs[dirname] = new_dir        
+
+    def stat_file(self, filename: str, size: int):
+        if filename not in self.cwd.files:
+            new_file = File(
+                name = filename,
+                # parent = self.cwd,
+                size = int(size),
+                ext = filename.split('.')[1] if '.' in filename else None
+            )
+            self.cwd.files[filename] = new_file
+
+    def cd(self, arg: str):
+            if arg == '..':
+                self.cwd = self.cwd.parent
+            else:
+                if arg not in self.cwd.dirs:
+                    print(f"Creating directory {arg}...")
+                    new_dir = Directory(
+                        name = arg,
+                        parent = self.cwd,
+                        dirs = {},
+                        files = {},
+                    )
+                    self.cwd.dirs[arg] = new_dir
+                self.cwd = self.cwd.dirs[arg]
+
     def process_line(self, line: str):
         if line.startswith('dir'):
             dirname = line.split()[1]
-            if dirname == '/':
-                dirname = 'root'
-            if dirname not in self.cwd.dirs:
-                new_dir = Directory(
-                    name = dirname,
-                    parent = self.cwd,
-                    dirs = {},
-                    files = {},
-                )
-                self.cwd.dirs[dirname] = new_dir
+            self.mkdir(dirname)
         elif line[0].isdigit():
             size, filename = line.split()
-            if filename not in self.cwd.files:
-                new_file = File(
-                    name = filename,
-                    # parent = self.cwd,
-                    size = int(size),
-                    ext = filename.split('.')[1] if '.' in filename else None
-                )
-                self.cwd.files[filename] = new_file
+            self.stat_file(filename, size)
         elif self.is_command(line):
             command, arg = self.split_command(line)
             if command == 'cd' and arg != '/':
-                if arg == '..':
-                    self.cwd = self.cwd.parent
-                else:
-                    if arg not in self.cwd.dirs:
-                        print(f"Creating directory {arg}...")
-                        new_dir = Directory(
-                            name = arg,
-                            parent = self.cwd,
-                            dirs = {},
-                            files = {},
-                        )
-                        self.cwd.dirs[arg] = new_dir
-                    self.cwd = self.cwd.dirs[arg]
+                self.cd(arg)
             elif command == 'ls':
                 pass
     
@@ -95,12 +105,12 @@ class FileSystem:
         for line in self.commands:
             self.process_line(line)
 
-    def calc_dir_size(self, directory: Directory = None):
+    def du(self, directory: Directory = None):
         if directory is None:
             directory = self.root
         size = 0
         size += sum([file.size for file in directory.files.values()])
-        size += sum([self.calc_dir_size(subdir) for subdir in directory.dirs.values()])
+        size += sum([self.du(subdir) for subdir in directory.dirs.values()])
         directory.size = size
         self.dirs.append(directory)
         return size
@@ -124,20 +134,17 @@ class FileSystem:
 
 def solve(raw):
     fs = FileSystem(raw)
-    fs.process_lines()
-    fs.calc_dir_size()
+    fs.du()
     return fs.get_total_size()
 
 def solve2(raw):
     fs = FileSystem(raw)
-    fs.process_lines()
-    fs.calc_dir_size()
+    fs.du()
     return fs.find_dir_to_delete()
 
 ## Testing
 assert solve(test) == 95437
 assert solve2(test) == 24933642
-
 
 ## Solutions
 print(f"Solution to part 1: {solve(raw)}")
