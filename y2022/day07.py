@@ -22,6 +22,9 @@ class File:
     size: int = 0
     ext: str = None
 
+    def __post_init__(self):
+        self.ext = self.name.split(".")[-1] if "." in self.name else None
+
 
 @dataclass
 class FileSystem:
@@ -70,7 +73,6 @@ class FileSystem:
                 name=filename,
                 # parent = self.cwd,
                 size=int(size),
-                ext=filename.split(".")[1] if "." in filename else None,
             )
             self.cwd.files[filename] = new_file
 
