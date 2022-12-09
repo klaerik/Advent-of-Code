@@ -31,3 +31,12 @@ def product(nums):
     for num in nums:
         out *= num
     return out
+
+
+def sign(num):
+    if num == 0:
+        return 0
+    elif num > 0:
+        return 1
+    else:
+        return -1

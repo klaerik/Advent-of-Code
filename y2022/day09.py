@@ -13,20 +13,34 @@ class Knot:
     y: int = 0
     history: set = field(default_factory=set)
 
-    def move(self, direction: str):
+    def snapshot(self):
+        self.history.add((self.x, self.y))
+
+    def touches(self, knot: "Knot"):
+        touch_x = (knot.x - 1) <= self.x <= (knot.x + 1)
+        touch_y = (knot.y - 1) <= self.y <= (knot.y + 1)
+        return touch_x and touch_y
+
+    def move_head(self, direction: str):
         dirs = {
-            'U': (0, 1),
-            'D': (0,-1),
-            'L': (-1,0),
-            'R': (1, 0),
+            "U": (0, 1),
+            "D": (0, -1),
+            "L": (-1, 0),
+            "R": (1, 0),
         }
         for d in direction:
             dx, dy = dirs[d]
             self.x += dx
             self.y += dy
 
-    def snapshot(self):
-        self.history.add((self.x, self.y))
+    def move_tail(self, knot: "Knot"):
+        if self.touches(knot):
+            return
+        dx = shared.sign(knot.x - self.x)
+        dy = shared.sign(knot.y - self.y)
+        self.x += dx
+        self.y += dy
+
 
 @dataclass
 class Rope:
@@ -44,40 +58,16 @@ class Rope:
     def snapshot(self):
         self.tails[-1].snapshot()
 
-    def is_touching(self, head, tail):
-        touch_x = (head.x - 1) <= tail.x <= (head.x + 1)
-        touch_y = (head.y - 1) <= tail.y <= (head.y + 1)
-        return touch_x and touch_y
-
-    def sign(self, num):
-        if num == 0:
-            return 0
-        elif num > 0:
-            return 1
-        else:
-            return -1 
-
-    def move_head(self, direction: str):
-        self.head.move(direction)
-
-    def move_tail(self, head, tail):
-        if self.is_touching(head, tail):
-           return
-        dx = self.sign(head.x - tail.x)
-        dy = self.sign(head.y - tail.y)
-        tail.x += dx
-        tail.y += dy
-    
     def process_movement(self):
         direction, val = self.movements.pop().split()
         for _ in range(int(val)):
-            self.move_head(direction)
+            self.head.move_head(direction)
             head = self.head
             for tail in self.tails:
-                self.move_tail(head, tail)
+                tail.move_tail(head)
                 head = tail
             self.snapshot()
-    
+
     def process_movements(self):
         while self.movements:
             self.process_movement()
@@ -87,6 +77,7 @@ def solve(raw, knots=2):
     rope = Rope(movements=raw[::-1], knots=knots)
     rope.process_movements()
     return len(rope.tails[-1].history)
+
 
 ## Testing
 assert solve(test) == 13
