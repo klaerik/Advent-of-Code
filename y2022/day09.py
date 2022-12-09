@@ -11,6 +11,7 @@ test2 = shared.read_file("day09-test2.txt")
 class Knot:
     x: int = 0
     y: int = 0
+    tail: "Knot" = None
     history: set = field(default_factory=set)
 
     def snapshot(self):
@@ -32,51 +33,55 @@ class Knot:
             dx, dy = dirs[d]
             self.x += dx
             self.y += dy
+        self.tail.move_tail(self)
 
-    def move_tail(self, knot: "Knot"):
-        if self.touches(knot):
+    def move_tail(self, head: "Knot"):
+        if self.touches(head):
             return
-        dx = shared.sign(knot.x - self.x)
-        dy = shared.sign(knot.y - self.y)
+        dx = shared.sign(head.x - self.x)
+        dy = shared.sign(head.y - self.y)
         self.x += dx
         self.y += dy
+        if self.tail is not None:
+            self.tail.move_tail(self)
 
 
 @dataclass
 class Rope:
     movements: list
     head: Knot = field(default_factory=Knot)
+    tail: Knot = None
     knots: int = 2
-    tails: list = field(default_factory=list)
 
     def __post_init__(self):
+        knot = self.head
         for _ in range(self.knots - 1):
-            tail = Knot()
-            self.tails.append(tail)
+            knot.tail = Knot()
+            knot = knot.tail
+        self.tail = knot
         self.snapshot()
 
     def snapshot(self):
-        self.tails[-1].snapshot()
+        self.tail.snapshot()
 
     def process_movement(self):
         direction, val = self.movements.pop().split()
         for _ in range(int(val)):
             self.head.move_head(direction)
-            head = self.head
-            for tail in self.tails:
-                tail.move_tail(head)
-                head = tail
             self.snapshot()
 
     def process_movements(self):
         while self.movements:
             self.process_movement()
 
+    def tail_travel(self):
+        return len(self.tail.history)
+
 
 def solve(raw, knots=2):
     rope = Rope(movements=raw[::-1], knots=knots)
     rope.process_movements()
-    return len(rope.tails[-1].history)
+    return rope.tail_travel()
 
 
 ## Testing
