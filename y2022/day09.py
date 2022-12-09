@@ -44,6 +44,8 @@ class Knot:
         self.y += dy
         if self.tail is not None:
             self.tail.move_tail(self)
+        else:
+            self.snapshot()
 
 
 @dataclass
@@ -59,16 +61,12 @@ class Rope:
             knot.tail = Knot()
             knot = knot.tail
         self.tail = knot
-        self.snapshot()
-
-    def snapshot(self):
         self.tail.snapshot()
 
     def process_movement(self):
         direction, val = self.movements.pop().split()
         for _ in range(int(val)):
             self.head.move_head(direction)
-            self.snapshot()
 
     def process_movements(self):
         while self.movements:
