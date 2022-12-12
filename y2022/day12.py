@@ -53,7 +53,7 @@ class AreaMap:
 
 @dataclass
 class Hiker: 
-    grid: Map
+    grid: AreaMap
     x: int
     y: int
     z: int
