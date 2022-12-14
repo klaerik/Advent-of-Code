@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+
 import y2022.shared as shared
 
 ## Data
@@ -12,10 +13,13 @@ class Cavern:
     grid: dict = field(default_factory=dict)
     floor: int = None
     hole: tuple = (500,0)
+    endless: bool = True
 
     def __post_init__(self):
         self.init_grid()
-        self.floor = max([y for _,y in self.grid.keys()])
+        self.floor = max([y+2 for _,y in self.grid.keys()])
+        if not self.endless:
+            self.map_path(f"-5000,{self.floor} -> 5000,{self.floor}")
 
     def map_coordinates(self, start, stop):
         x0, y0 = start
@@ -39,6 +43,9 @@ class Cavern:
     def init_grid(self):
         for path in self.raw:
             self.map_path(path)
+
+    def is_clogged(self):
+        return self.hole in self.grid
 
     def count_sand(self):
         return len([i for i in self.grid.values() if type(i) == Sand])
@@ -88,32 +95,20 @@ class Sand:
             self.step()
 
 
-cavern = Cavern(test)
-cavern.floor
-sand = Sand(cavern=cavern)
-sand.fall()
-print(cavern.viz()[:3000])
-sand.x, sand.y
-print(cavern.viz())
-
-def solve(raw):
-    cavern = Cavern(raw)
+def solve(raw, endless=True):
+    cavern = Cavern(raw, endless=endless)
     while True:
         sand = Sand(cavern=cavern)
         sand.fall()
-        if sand.is_in_freefall():
+        if sand.is_in_freefall() or cavern.is_clogged():
             break
     return cavern.count_sand()
 
-def solve2(raw):
-    pass
-
-
 ## Testing
 assert solve(test) == 24
-assert solve2(test) == None
+assert solve(test, endless=False) == 93
 
 
 ## Solutions
 print(f"Solution to part 1: {solve(raw)}")
-print(f"Solution to part 2: {solve2(raw)}")
+print(f"Solution to part 2: {solve(raw, endless=False)}")
