@@ -1,4 +1,5 @@
 import y2022.shared as shared
+from dataclasses import dataclass, field
 
 ## Data
 raw = shared.read_file("dayXX.txt")
