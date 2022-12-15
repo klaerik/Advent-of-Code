@@ -35,6 +35,10 @@ class Sensor:
     def in_range(self, x: int, y: int) -> bool:
         return self.calc_dist(x,y) <= self.d
 
+    def skip_to_x(self, x: int, y: int) -> int:
+        """Get the rightmost x."""
+        return self.x + (self.d - abs(self.y - y)) + 1
+
 @dataclass
 class Tunnels:
     raw: list
@@ -60,7 +64,7 @@ class Tunnels:
             max_d = max([sensor.d, max_d])
         return (min_x-max_d, min_y-max_d, max_x+max_d, max_y+max_d)
 
-    def no_beacon(self, x: int, y: int) -> bool:
+    def no_beacon(self, x: int, y: int):
         for sensor in self.sensors:
             if sensor.in_range(x, y) and (x,y) != (sensor.bx, sensor.by):
                 return True
@@ -73,29 +77,39 @@ class Tunnels:
             if self.no_beacon(x,y):
                 beacon_free += 1
         return beacon_free
-
-
-    
-
-tunnels = Tunnels(test)
-tunnels.count_unseen_positions(y=10)
+        
+    def find_tuning_freq(self, top_n):
+        for y in range(0, top_n+1):
+            if y % 100000 == 0:
+                print("y=", y)
+            x = 0
+            while 0 <= x <= top_n:
+                # print("x=", x)
+                found = True
+                for sensor in self.sensors:
+                    if sensor.in_range(x,y):
+                        x = sensor.skip_to_x(x,y)
+                        found = False
+                        break
+                if found:
+                    return (x * 4000000) + y
+                    # return (x,y)
 
 
 def solve(raw, y):
     tunnels = Tunnels(raw)
     return tunnels.count_unseen_positions(y)
 
-
-
-def solve2(raw):
-    pass
+def solve2(raw, top_n):
+    tunnels = Tunnels(raw)
+    return tunnels.find_tuning_freq(top_n)
 
 
 ## Testing
-assert solve(test) == 26
-assert solve2(test) == None
+assert solve(test, 10) == 26
+assert solve2(test, 20) == 56000011
 
 
 ## Solutions
-print(f"Solution to part 1: {solve(raw)}")
-print(f"Solution to part 2: {solve2(raw)}")
+print(f"Solution to part 1: {solve(raw, 2000000)}")
+print(f"Solution to part 2: {solve2(raw, 4000000)}")
