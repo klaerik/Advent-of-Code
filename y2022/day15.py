@@ -1,6 +1,7 @@
-import y2022.shared as shared
-from dataclasses import dataclass, field
 import re
+from dataclasses import dataclass, field
+
+import y2022.shared as shared
 
 ## Data
 raw = shared.read_file("day15.txt")
@@ -52,6 +53,7 @@ class Tunnels:
         for row in self.raw:
             sensor = Sensor(row)
             self.sensors.append(sensor)
+        self.sensors.sort(key=lambda sensor: sensor.x)
 
     def get_boundaries(self):
         min_x = min_y = float('inf')
@@ -90,7 +92,8 @@ class Tunnels:
                     if sensor.in_range(x,y):
                         x = sensor.skip_to_x(x,y)
                         found = False
-                        break
+                        if x >= top_n:
+                            break
                 if found:
                     return (x * 4000000) + y
                     # return (x,y)
