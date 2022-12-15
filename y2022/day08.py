@@ -13,13 +13,37 @@ class Tree:
     y: int
     height: int
     neighbor_height: int = 999
+    forest: "Forest" = None
 
     def add_neighbor(self, new_height):
         if new_height < self.neighbor_height:
             self.neighbor_height = new_height
 
-    def is_visible(self):
+    def is_visible(self) -> bool:
         return self.height > self.neighbor_height
+
+    def look(self, direction: str) -> int:
+        dirs = {"N": (0, 1), "S": (0, -1), "W": (-1, 0), "E": (1, 0)}
+        x,y = self.x, self.y
+        is_blocked = False
+        seen = 0
+        while not is_blocked:
+            x += dirs[direction][0]
+            y += dirs[direction][1]
+            if (x,y) not in self.forest.trees:
+                is_blocked = True
+            else:
+                seen += 1
+                height = self.forest.trees[(x,y)].height
+                if height >= self.height:
+                    is_blocked = True
+        return seen
+
+    def scenic_score(self):
+        score = 1
+        for direction in ('N','S','E','W'):
+            score *= self.look(direction)
+        return score
 
 
 @dataclass
@@ -33,7 +57,7 @@ class Forest:
     def setup_trees(self):
         for y, row in enumerate(self.grid):
             for x, height in enumerate(row):
-                self.trees[(x, y)] = Tree(x, y, int(height))
+                self.trees[(x, y)] = Tree(x, y, int(height), forest=self)
 
     def step(self, x: int, y: int, direction: str):
         dirs = {"N": (0, 1), "S": (0, -1), "W": (-1, 0), "E": (1, 0)}
@@ -62,6 +86,9 @@ class Forest:
     def count_visible(self):
         return len([tree for tree in self.trees.values() if tree.is_visible()])
 
+    def max_scenic_score(self) -> int:
+        return max([tree.scenic_score() for tree in self.trees.values()])
+
 
 def solve(raw):
     forest = Forest(raw)
@@ -70,17 +97,9 @@ def solve(raw):
 
 
 def solve2(raw):
-    pass
+    forest = Forest(raw)
+    return forest.max_scenic_score()
 
-
-forest = Forest(test)
-forest.calc_all_heights()
-
-from pprint import pprint
-
-pprint([(tree, tree.is_visible()) for tree in forest.trees.values()])
-#  (Tree(x=2, y=1, height=5, neighbor_height=5), False),
-forest.trees[(2, 1)].is_visible()
 
 ## Testing
 assert solve(test) == 21
