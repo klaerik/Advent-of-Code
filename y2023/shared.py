@@ -12,7 +12,7 @@ def read_file(
 
     if type(path) is str:
         print("Building path for input file")
-        path = Path() / "y2022" / "input" / path
+        path = Path() / "y2023" / "input" / path
 
     print(f"Loading file from {path}")
     out = []
