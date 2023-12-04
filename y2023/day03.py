@@ -7,6 +7,7 @@ test = shared.read_file("day03-test.txt")
 
 ## Functions
 
+
 @dataclass
 class Grid:
     raw: list[str]
@@ -19,30 +20,29 @@ class Grid:
     def raw_to_grid(self):
         self.grid = {}
         self.nums = []
-        for y,row in enumerate(self.raw):
+        for y, row in enumerate(self.raw):
             num = None
-            for x,val in enumerate(row):
+            for x, val in enumerate(row):
                 if val.isdigit():
                     if num is None:
-                        num = Number(val, [(x,y)], self)
+                        num = Number(val, [(x, y)], self)
                         self.nums.append(num)
                     else:
                         num.raw += val
-                        num.coordinates.append((x,y))
-                    self.grid[(x,y)] = num
+                        num.coordinates.append((x, y))
+                    self.grid[(x, y)] = num
                 else:
-                    if val != '.':
-                        self.grid[(x,y)] = val
+                    if val != ".":
+                        self.grid[(x, y)] = val
                     num = None
 
     def get_neighbor_coordinates(self, x, y) -> set[tuple[int, int]]:
         neighbor_coordinates = set()
-        options = ((0, 1), (0, -1), (-1, 0), (1, 0), 
-                     (-1, 1), (-1, -1), (1, 1), (1, -1))
-        for dx,dy in options:
-            neighbor_coordinates.add((x+dx, y+dy))
+        options = ((0, 1), (0, -1), (-1, 0), (1, 0), (-1, 1), (-1, -1), (1, 1), (1, -1))
+        for dx, dy in options:
+            neighbor_coordinates.add((x + dx, y + dy))
         return neighbor_coordinates
-    
+
     def get_neighbors(self, x, y) -> set:
         coords = self.get_neighbor_coordinates(x, y)
         out = set()
@@ -50,17 +50,17 @@ class Grid:
             if point in self.grid:
                 out.add(self.grid[point])
         return out
-    
+
     def get_part_numbers(self) -> list[int]:
         out = []
         for num in self.nums:
             if num.is_part_number():
                 out.append(num.val)
         return out
-    
+
     def find_gear_ratios(self) -> list[int]:
         out = []
-        gears = [point for point,val in self.grid.items() if val == '*']
+        gears = [point for point, val in self.grid.items() if val == "*"]
         for gear in gears:
             neighbors = {x for x in self.get_neighbors(*gear) if isinstance(x, Number)}
             if len(neighbors) == 2:
@@ -74,11 +74,11 @@ class Number:
     raw: str
     coordinates: list | None = None
     grid: Grid | None = None
-  
+
     @property
-    def val(self):
+    def val(self) -> int:
         return int(self.raw)
-    
+
     def is_part_number(self):
         for point in self.coordinates:
             neighbors = self.grid.get_neighbors(*point)
@@ -89,9 +89,12 @@ class Number:
 
     def __hash__(self):
         return hash(tuple(self.coordinates))
-    
+
     def __repr__(self):
         return f"Number: {self.val}"
+
+    def __mul__(self, number: "Number") -> int:
+        return self.val * number.val
 
 
 def solve(raw):
