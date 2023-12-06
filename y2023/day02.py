@@ -4,30 +4,35 @@ from dataclasses import dataclass, field
 ## Data
 raw = shared.read_file("day02.txt")
 test = shared.read_file("day02-test.txt")
-bag_part1 = {'red': 12, 'green': 13, 'blue': 14}
+bag_part1 = {"red": 12, "green": 13, "blue": 14}
+
 
 ## Functions
 def parse_color(num_color: str) -> tuple:
     # print(num_color)
-    num, color = num_color.strip().split(' ')
+    num, color = num_color.strip().split(" ")
     num = int(num)
     return (color, num)
 
+
 def parse_hand(hand: str) -> dict:
-    colors = hand.split(',')
+    colors = hand.split(",")
     color_cnts = [parse_color(color) for color in colors]
     color_dict = dict(color_cnts)
     return color_dict
 
+
 def split_game_to_hands(game: str) -> list:
-    hands = game.split(':')[-1].split(';')
+    hands = game.split(":")[-1].split(";")
     return [parse_hand(hand) for hand in hands]
 
+
 def is_valid_hand(hand: dict, bag: dict) -> bool:
-    for k,v in hand.items():
+    for k, v in hand.items():
         if v > bag.get(k, 0):
             return False
     return True
+
 
 def get_max_color_values(hands: list[dict]) -> dict:
     maxes = None
@@ -35,9 +40,10 @@ def get_max_color_values(hands: list[dict]) -> dict:
         if not maxes:
             maxes = hand
         else:
-            for k,v in hand.items():
+            for k, v in hand.items():
                 maxes[k] = max(maxes.get(k, 0), v)
     return maxes
+
 
 def get_power(colors: dict) -> int:
     out = 1
@@ -58,7 +64,7 @@ def is_possible_game(game: str, bag: dict) -> bool:
 
 def solve(raw, bag):
     out = 0
-    for i,game in enumerate(raw, start=1):
+    for i, game in enumerate(raw, start=1):
         if is_possible_game(game, bag):
             out += i
     return out
@@ -70,9 +76,8 @@ def solve2(raw):
     return sum(game_powers)
 
 
-
 ## Testing
-assert parse_color('3 blue') == ('blue', 3)
+assert parse_color("3 blue") == ("blue", 3)
 assert solve(test, bag_part1) == 8
 assert solve2(test) == 2286
 

@@ -1,6 +1,7 @@
 import y2023.shared as shared
 from dataclasses import dataclass, field
 
+
 ## Data
 raw = shared.read_file("day04.txt")
 test = shared.read_file("day04-test.txt")
@@ -30,12 +31,19 @@ def solve(raw):
 
 
 def solve2(raw):
-    pass
+    counts = [1] * len(raw)
+    for i, card in enumerate(raw):
+        nums = parse_card(card)
+        _, matches = score_card(*nums)
+        for j in range(1, matches + 1):
+            if i + j < len(counts):
+                counts[i + j] += 1 * counts[i]
+    return sum(counts)
 
 
 ## Testing
 assert solve(test) == 13
-assert solve2(test) == None
+assert solve2(test) == 30
 
 
 ## Solutions
