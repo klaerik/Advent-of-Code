@@ -40,7 +40,7 @@ class Almanac:
                 out_map[new_typ].append(
                     (
                         dest_start,
-                        dest_start + range_length,
+                        dest_start + range_length - 1,
                         src_start,
                         range_length,
                     )
@@ -66,7 +66,7 @@ class Almanac:
 
             elif src and row and row[0].isnumeric():
                 dest_start, src_start, range_length = self.str_to_ints(row)
-                src_end = src_start + range_length
+                src_end = src_start + range_length - 1
                 self.maps[src].append((src_start, src_end, dest_start, range_length))
 
             else:
@@ -90,7 +90,7 @@ class Almanac:
 
     def traverse_mapping(self, num: int, start_typ: str = "seed") -> int:
         typ = start_typ
-        while typ:
+        while self.map_order.get(typ):
             typ, num = self.translate_number(typ, num)
         return num
 
@@ -103,7 +103,6 @@ class Almanac:
             print(f"Range: {start, length}...", flush=True)
             for i in range(start, start + length):
                 new_num = self.traverse_mapping(i)
-                print(i, new_num)
                 out = min(out, new_num)
         return out
 
@@ -127,26 +126,6 @@ def solve2(raw):
 
 
 ## Testing
-almanac = Almanac(test)
-almanac.translate_number("soil", 81)
-almanac.traverse_mapping(79)
-almanac.get_locations()
-almanac.maps
-almanac.map_order
-almanac.reverse_map()
-almanac.map_order
-almanac.maps
-almanac.get_min_location_brute()
-almanac.traverse_mapping(82)
-
-almanac = Almanac(test, reversed=True)
-almanac.get_min_seed()
-almanac.traverse_mapping(46, "location")
-
-almanac = Almanac(raw, reversed=True)
-almanac.traverse_mapping(79004095, "location")
-almanac.seeds
-
 assert solve(test) == 35
 assert solve2(test) == 46
 

@@ -1,5 +1,5 @@
 import y2023.shared as shared
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 ## Data
 raw = shared.read_file("dayXX.txt")
@@ -8,11 +8,11 @@ test = shared.read_file("dayXX-test.txt")
 ## Functions
 
 
-def solve(raw):
+def solve(test):
     pass
 
 
-def solve2(raw):
+def solve2(test):
     pass
 
 
