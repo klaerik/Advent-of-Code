@@ -6,6 +6,7 @@ import re
 ## Data
 raw = shared.read_file("day08.txt")
 test = shared.read_file("day08-test.txt")
+test2 = shared.read_file("day08-test2.txt")
 
 ## Functions
 
@@ -22,10 +23,11 @@ class CamelMap:
         self.parse_map()
         self.positions = ["AAA"]
         if self.is_ghost:
-            possible = set()
+            possible = set(self.network.keys())
             for pair in self.network.values():
                 possible.union(pair)
-            self.positions = [x for x in possible if x.endswith("Z")]
+            print(possible)
+            self.positions = [x for x in possible if x.endswith("A")]
 
     def parse_map(self):
         self.instructions = deque(self.raw_map[0])
@@ -78,14 +80,15 @@ def solve2(test):
 
 
 ## Testing
-camelmap = CamelMap(test)
+camelmap = CamelMap(test2, is_ghost=True)
 camelmap.instructions
 camelmap.network
+camelmap.positions
 
 assert solve(test) == 2
-assert solve(test, True) == 6
+assert solve(test2, True) == 6
 
 
 ## Solutions
 print(f"Solution to part 1: {solve(raw)}")
-print(f"Solution to part 2: {solve2(raw)}")
+print(f"Solution to part 2: {solve(raw, True)}")
