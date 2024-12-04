@@ -5,7 +5,28 @@ from dataclasses import dataclass
 raw = shared.read_file("dayXX.txt")
 test = shared.read_file("dayXX-test.txt")
 
+
 ## Functions
+@dataclass
+class HangGlider:
+    raw: list[str]
+    grid: dict | None = None
+
+    def build_grid(self):
+        grid = {}
+        for y, row in enumerate(self.raw):
+            for x, pipe in enumerate(row):
+                point = Point(pipe, x, y)
+
+
+@dataclass
+class Point:
+    pipe: str
+    x: int
+    y: int
+    left: "Point" | None = None
+    right: "Point" | None = None
+    distance: int | None = None
 
 
 def solve(test):
