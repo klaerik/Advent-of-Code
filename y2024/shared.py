@@ -1,6 +1,27 @@
-from pathlib import Path
+import re
 import typing
 from dataclasses import dataclass
+from pathlib import Path
+
+YEAR = 2024
+
+
+def init_day(num: int):
+    """Set up a new day."""
+    folder = Path(f"y{YEAR}")
+    day = str(num).zfill(2)
+    template = folder / "_template.py"
+    script = folder / f"day{day}.py"
+    if not script.exists():
+        text = template.read_text()
+        text = re.sub(r"dayXX", f"day{day}", text)
+        script.write_text(text)
+    data = folder / "input" / f"day{day}.txt"
+    if not data.exists():
+        data.touch()
+    data = folder / "input" / f"day{day}-test.txt"
+    if not data.exists():
+        data.touch()
 
 
 @dataclass
@@ -25,10 +46,9 @@ def read_file(
     include_blank_lines: bool = False,
     convert: typing.Callable = None,
 ):
-
     if type(path) is str:
         print("Building path for input file")
-        path = Path() / "y2024" / "input" / path
+        path = Path() / f"y{YEAR}" / "input" / path
 
     print(f"Loading file from {path}")
     out = []
