@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+from typing import Literal
 
 import y2024.shared as shared
 
@@ -44,20 +45,23 @@ class Grid(dict):
             cols.append("".join(col))
         return cols
 
-    def get_diagonal(self, point: tuple):
+    def get_diagonal(self, point: tuple, direction: Literal["up", "down"] = "up"):
         out = []
+        move = 1 if direction == "up" else -1
         while point in self.grid:
             out.append(self.grid[point])
-            point = point[0] + 1, point[1] + 1
+            point = point[0] + 1, point[1] + move
         return "".join(out)
 
     def get_diagonals(self):
         out = []
         for y in range(self.shape_y):
-            out.append(self.get_diagonal((0, y)))
+            out.append(self.get_diagonal((0, y), direction="up"))
+            out.append(self.get_diagonal((0, y), direction="down"))
         out.reverse()
         for x in range(1, self.shape_x):
-            out.append(self.get_diagonal((x, 0)))
+            out.append(self.get_diagonal((x, 0), direction="up"))
+            out.append(self.get_diagonal((x, self.shape_y - 1), direction="down"))
         return out
 
 
@@ -82,7 +86,7 @@ def solve(test):
     count = 0
     for combo in combos:
         count += len(re.findall(r"(?=XMAS|SAMX)", combo))
-        print(count, combo)
+        # print(count, combo)
     return count
 
 
