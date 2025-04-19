@@ -1,8 +1,0 @@
-name: advent-of-code
-channels:
-  - conda-forge
-dependencies:
-  - python==3.11
-  - black
-  - isort
-  - pyperclip
