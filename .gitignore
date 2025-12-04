@@ -4,3 +4,4 @@ input/*
 *.venv*
 *.vscode*
 .micromamba
+uv.lock
