@@ -28,13 +28,12 @@ def get_max_joltage2(bank: str) -> int:
     while batteries:
         left = batteries.pop()
         for i, val in enumerate(current):
-            if left > val:
+            if left >= val:
                 current[i] = left
                 left = val
                 seen.append("".join(current))
             else:
                 break
-    print(seen)
     return max((int(x) for x in seen))
 
 
@@ -54,6 +53,7 @@ assert solve(test) == 357
 assert get_max_joltage2("987654321111111") == 987654321111
 assert get_max_joltage2("811111111111119") == 811111111119
 assert get_max_joltage2("234234234234278") == 434234234278
+assert get_max_joltage2("818181911112111") == 888911112111
 assert solve2(test) == 3121910778619
 
 
