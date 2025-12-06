@@ -5,3 +5,4 @@ input/*
 *.vscode*
 .micromamba
 uv.lock
+.python-version
