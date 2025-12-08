@@ -39,10 +39,7 @@ class Calculator:
 
     def solve_problem(self, problem: dict, ceph_nums: bool = False) -> int:
         op = problem["op"]
-        if ceph_nums:
-            nums = problem["ceph_nums"]
-        else:
-            nums = problem["nums"]
+        nums = problem["ceph_nums"] if ceph_nums else problem["nums"]
         if op == "+":
             return sum(nums)
         elif op == "*":
